@@ -135,8 +135,8 @@ public:
 	bool loadFont(const string& path, const string& name);
 	bool textFont(const string& name);
 	
-	void text(const string& text, float x, float y, float line_break_width = std::numeric_limits<float>::infinity());
-	ofRectangle textBounds(const string& text, float x, float y, float line_break_width = std::numeric_limits<float>::infinity());
+	void text(const string& text, float x, float y, float line_break_width = 0);
+	ofRectangle textBounds(const string& text, float x, float y, float line_break_width = 0);
 	
 	void textSize(float size);
 	void textBlur(float blur);

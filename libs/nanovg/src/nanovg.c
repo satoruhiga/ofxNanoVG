@@ -2534,7 +2534,6 @@ int nvgTextBreakLines(struct NVGcontext* ctx, const char* string, const char* en
 						rowMinX = wordMinX;
 						rowMaxX = q.x1 - rowStartX;
 						// No change to the word start
-						printf("%s\n", rowStart);
 					}
 					// Set null break point
 					breakEnd = rowStart;

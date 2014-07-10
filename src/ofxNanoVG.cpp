@@ -195,7 +195,7 @@ void Canvas::begin()
 {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	ofPushView();
-	ofViewport(0, 0, width, height);
+	ofViewport(0, ofGetViewportHeight() - height, width, height);
 
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
@@ -208,6 +208,8 @@ void Canvas::begin()
 	resetState();
 	
 	textLineHeight(1);
+	fillColor(ofColor(127));
+	strokeColor(ofColor(127));
 }
 
 void Canvas::end()
@@ -405,20 +407,38 @@ bool Canvas::fontStyle(const FontStyle& font_style)
 
 bool Canvas::textFont(const string& name)
 {
-	if (nvgFindFont(vg, name.c_str()) == -1) return false;
+	if (nvgFindFont(vg, name.c_str()) == -1)
+	{
+		ofLogError("Canvas") << "font not loaded: " << name;
+		return false;	
+	}
 	nvgFontFace(vg, name.c_str());
 	return true;
 }
 
 void Canvas::text(const string& text, float x, float y, float line_break_width)
 {
-	nvgTextBox(vg, x, y, line_break_width, text.c_str(), text.c_str() + text.size());
+	if (line_break_width == 0)
+	{
+		nvgText(vg, x, y, text.c_str(), text.c_str() + text.size());
+	}
+	else
+	{
+		nvgTextBox(vg, x, y, line_break_width, text.c_str(), text.c_str() + text.size());
+	}
 }
 
 ofRectangle Canvas::textBounds(const string& text, float x, float y, float line_break_width)
 {
 	float r[4];
-	nvgTextBoxBounds(vg, x, y, line_break_width, text.c_str(), text.c_str() + text.size(), r);
+	if (line_break_width == 0)
+	{
+		nvgTextBounds(vg, x, y, text.c_str(), text.c_str() + text.size(), r);
+	}
+	else
+	{
+		nvgTextBoxBounds(vg, x, y, line_break_width, text.c_str(), text.c_str() + text.size(), r);
+	}
 	return ofRectangle(r[0], r[1], r[2] - r[0], r[3] - r[1]);
 }
 
