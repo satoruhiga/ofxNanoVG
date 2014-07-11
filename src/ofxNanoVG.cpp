@@ -215,6 +215,11 @@ void Canvas::begin()
 void Canvas::end()
 {
 	nvgEndFrame(vg);
+	
+	// {{{ quick fix for nanovg vbo unbind bug
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	// }}}
+
 	framebuffer->unbind();
 	
 	ofPopView();
