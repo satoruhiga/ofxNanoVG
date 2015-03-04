@@ -24,7 +24,6 @@
 		E4C2424910CC5A17004149E2 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4C2424610CC5A17004149E2 /* IOKit.framework */; };
 		E4EB6799138ADC1D00A09F29 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E7892E2B196BF90400185B0D /* nanovg.c in Sources */ = {isa = PBXBuildFile; fileRef = E7892E20196BF90400185B0D /* nanovg.c */; };
-		E7892E2C196BF90400185B0D /* stb_image.c in Sources */ = {isa = PBXBuildFile; fileRef = E7892E24196BF90400185B0D /* stb_image.c */; };
 		E7892E2D196BF90400185B0D /* ofxNanoVG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7892E29196BF90400185B0D /* ofxNanoVG.cpp */; };
 		E7E077E515D3B63C0020DFD4 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7E077E415D3B63C0020DFD4 /* CoreVideo.framework */; };
 		E7E077E815D3B6510020DFD4 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7E077E715D3B6510020DFD4 /* QTKit.framework */; };
@@ -86,9 +85,7 @@
 		E7892E21196BF90400185B0D /* nanovg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nanovg.h; sourceTree = "<group>"; };
 		E7892E22196BF90400185B0D /* nanovg_gl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nanovg_gl.h; sourceTree = "<group>"; };
 		E7892E23196BF90400185B0D /* nanovg_gl_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nanovg_gl_utils.h; sourceTree = "<group>"; };
-		E7892E24196BF90400185B0D /* stb_image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_image.c; sourceTree = "<group>"; };
 		E7892E25196BF90400185B0D /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
-		E7892E26196BF90400185B0D /* stb_image_write.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image_write.h; sourceTree = "<group>"; };
 		E7892E27196BF90400185B0D /* stb_truetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_truetype.h; sourceTree = "<group>"; };
 		E7892E29196BF90400185B0D /* ofxNanoVG.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxNanoVG.cpp; sourceTree = "<group>"; };
 		E7892E2A196BF90400185B0D /* ofxNanoVG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxNanoVG.h; sourceTree = "<group>"; };
@@ -244,9 +241,7 @@
 				E7892E21196BF90400185B0D /* nanovg.h */,
 				E7892E22196BF90400185B0D /* nanovg_gl.h */,
 				E7892E23196BF90400185B0D /* nanovg_gl_utils.h */,
-				E7892E24196BF90400185B0D /* stb_image.c */,
 				E7892E25196BF90400185B0D /* stb_image.h */,
-				E7892E26196BF90400185B0D /* stb_image_write.h */,
 				E7892E27196BF90400185B0D /* stb_truetype.h */,
 			);
 			path = src;
@@ -352,7 +347,6 @@
 				E7892E2D196BF90400185B0D /* ofxNanoVG.cpp in Sources */,
 				E7892E2B196BF90400185B0D /* nanovg.c in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
-				E7892E2C196BF90400185B0D /* stb_image.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -19,22 +19,24 @@
 #define NANOVG_GL_UTILS_H
 
 struct NVGLUframebuffer {
-	struct NVGcontext* ctx;
+	NVGcontext* ctx;
 	GLuint fbo;
 	GLuint rbo;
 	GLuint texture;
 	int image;
 };
+typedef struct NVGLUframebuffer NVGLUframebuffer;
 
 // Helper function to create GL frame buffer to render to.
-struct NVGLUframebuffer* nvgluCreateFramebuffer(struct NVGcontext* ctx, int w, int h);
-void nvgluDeleteFramebuffer(struct NVGcontext* ctx, struct NVGLUframebuffer* fb);
+void nvgluBindFramebuffer(NVGLUframebuffer* fb);
+NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags);
+void nvgluDeleteFramebuffer(NVGcontext* ctx, NVGLUframebuffer* fb);
 
 #endif // NANOVG_GL_UTILS_H
 
 #ifdef NANOVG_GL_IMPLEMENTATION
 
-#if defined(NANOVG_GL3)
+#if defined(NANOVG_GL3) || defined(NANOVG_GLES2) || defined(NANOVG_GLES3)
 // FBO is core in OpenGL 3>.
 #	define NANOVG_FBO_VALID 1
 #elif defined(NANOVG_GL2)
@@ -45,17 +47,24 @@ void nvgluDeleteFramebuffer(struct NVGcontext* ctx, struct NVGLUframebuffer* fb)
 #	endif
 #endif
 
-struct NVGLUframebuffer* nvgluCreateFramebuffer(struct NVGcontext* ctx, int w, int h)
+static GLint defaultFBO = -1;
+
+NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags)
 {
 #ifdef NANOVG_FBO_VALID
-	struct NVGLUframebuffer* fb = NULL;
-	fb = (struct NVGLUframebuffer*)malloc(sizeof(struct NVGLUframebuffer));
-	if (fb == NULL) goto error;
-	memset(fb, 0, sizeof(struct NVGLUframebuffer));
+	GLint defaultFBO;
+	GLint defaultRBO;
+	NVGLUframebuffer* fb = NULL;
 
-	fb->image = nvgCreateImageRGBA(ctx, w, h, NULL);
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
+	glGetIntegerv(GL_RENDERBUFFER_BINDING, &defaultRBO);
+
+	fb = (NVGLUframebuffer*)malloc(sizeof(NVGLUframebuffer));
+	if (fb == NULL) goto error;
+	memset(fb, 0, sizeof(NVGLUframebuffer));
+
+	fb->image = nvgCreateImageRGBA(ctx, w, h, imageFlags | NVG_IMAGE_FLIPY | NVG_IMAGE_PREMULTIPLIED, NULL);
 	fb->texture = nvglImageHandle(ctx, fb->image);
-	nvglImageFlags(ctx, fb->image, NVGL_TEXTURE_FLIP_Y | NVGL_TEXTURE_PREMULTIPLIED);
 
 	// frame buffer object
 	glGenFramebuffers(1, &fb->fbo);
@@ -72,28 +81,34 @@ struct NVGLUframebuffer* nvgluCreateFramebuffer(struct NVGcontext* ctx, int w, i
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) goto error;
 
+	glBindFramebuffer(GL_FRAMEBUFFER, defaultFBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, defaultRBO);
 	return fb;
 error:
+	glBindFramebuffer(GL_FRAMEBUFFER, defaultFBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, defaultRBO);
 	nvgluDeleteFramebuffer(ctx, fb);
 	return NULL;
 #else
 	NVG_NOTUSED(ctx);
 	NVG_NOTUSED(w);
 	NVG_NOTUSED(h);
+	NVG_NOTUSED(imageFlags);
 	return NULL;
 #endif
 }
 
-void nvgluBindFramebuffer(struct NVGLUframebuffer* fb)
+void nvgluBindFramebuffer(NVGLUframebuffer* fb)
 {
 #ifdef NANOVG_FBO_VALID
-	glBindFramebuffer(GL_FRAMEBUFFER, fb != NULL ? fb->fbo : 0);
+	if (defaultFBO == -1) glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, fb != NULL ? fb->fbo : defaultFBO);
 #else
 	NVG_NOTUSED(fb);
 #endif
 }
 
-void nvgluDeleteFramebuffer(struct NVGcontext* ctx, struct NVGLUframebuffer* fb)
+void nvgluDeleteFramebuffer(NVGcontext* ctx, NVGLUframebuffer* fb)
 {
 #ifdef NANOVG_FBO_VALID
 	if (fb == NULL) return;

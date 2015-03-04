@@ -164,6 +164,10 @@ public:
 	
 	void draw(float x, float y, float w = 0, float h = 0);
 	
+public:
+	
+	NVGcontext* getContext() const { return vg; }
+	
 private:
 	
 	struct NVGcontext* vg;
