@@ -158,6 +158,80 @@ private:
 	}
 };
 
+#pragma mark - Paint
+
+void LinearGradient::fill(Canvas& canvas) const
+{
+	NVGcontext* c = canvas.getContext();
+	NVGpaint o = nvgLinearGradient(c, from.position.x, from.position.y, to.position.x, to.position.y, *(NVGcolor*)&from.color.r, *(NVGcolor*)&to.color.r);
+	nvgFillPaint(c, o);
+}
+
+void LinearGradient::stroke(Canvas& canvas) const
+{
+	NVGcontext* c = canvas.getContext();
+	NVGpaint o = nvgLinearGradient(c, from.position.x, from.position.y, to.position.x, to.position.y, *(NVGcolor*)&from.color.r, *(NVGcolor*)&to.color.r);
+	nvgStrokePaint(c, o);
+}
+
+void BoxGradient::fill(Canvas& canvas) const
+{
+	NVGcontext* c = canvas.getContext();
+	NVGpaint o = nvgBoxGradient(c, rect.x, rect.y, rect.width, rect.height, corner_radius, feather, *(NVGcolor*)&inner.r, *(NVGcolor*)&outer.r);
+	nvgFillPaint(c, o);
+}
+
+void BoxGradient::stroke(Canvas& canvas) const
+{
+	NVGcontext* c = canvas.getContext();
+	NVGpaint o = nvgBoxGradient(c, rect.x, rect.y, rect.width, rect.height, corner_radius, feather, *(NVGcolor*)&inner.r, *(NVGcolor*)&outer.r);
+	nvgStrokePaint(c, o);
+}
+
+void RadialGradient::fill(Canvas& canvas) const
+{
+	NVGcontext* c = canvas.getContext();
+	NVGpaint o = nvgRadialGradient(c, center.x, center.y, inner.radius, outer.radius, *(NVGcolor*)&inner.color.r, *(NVGcolor*)&outer.color.r);
+	nvgFillPaint(c, o);
+}
+
+void RadialGradient::stroke(Canvas& canvas) const
+{
+	NVGcontext* c = canvas.getContext();
+	NVGpaint o = nvgRadialGradient(c, center.x, center.y, inner.radius, outer.radius, *(NVGcolor*)&inner.color.r, *(NVGcolor*)&outer.color.r);
+	nvgStrokePaint(c, o);
+}
+
+Image::~Image()
+{}
+
+void Image::upload(NVGcontext* ctx) const
+{
+	if (image) nvgDeleteImage(ctx, image);
+	if (tex->getTextureData().textureTarget != GL_TEXTURE_2D)
+		ofLogError("ofxNanoVG::Image") << "texture target should be GL_TEXTURE_2D";
+		
+	image = nvglCreateImageFromHandle(ctx, tex->getTextureData().textureID, tex->getWidth(), tex->getHeight(), flags);
+}
+
+void Image::fill(Canvas& canvas) const
+{
+	NVGcontext* c = canvas.getContext();
+	upload(c);
+	
+	NVGpaint o = nvgImagePattern(c, rect.x, rect.y, rect.width, rect.height, angle, image, alpha);
+	nvgFillPaint(c, o);
+}
+
+void Image::stroke(Canvas& canvas) const
+{
+	NVGcontext* c = canvas.getContext();
+	upload(c);
+	
+	NVGpaint o = nvgImagePattern(c, rect.x, rect.y, rect.width, rect.height, angle, image, alpha);
+	nvgStrokePaint(c, o);
+}
+
 #pragma mark - Canvas
 
 void Canvas::allocate(int width, int height)
@@ -177,7 +251,6 @@ void Canvas::allocate(int width, int height)
 	framebuffer->bind();
 	framebuffer->clear(background_color.r, background_color.g, background_color.b, background_color.a);
 	framebuffer->unbind();
-	
 }
 
 void Canvas::release()
@@ -298,8 +371,20 @@ void Canvas::fillPath()
 	nvgFill(vg);
 }
 
+void Canvas::fillPath(const PaintStyle& paint)
+{
+	paint.fill(*this);
+	nvgFill(vg);
+}
+
 void Canvas::strokePath()
 {
+	nvgStroke(vg);
+}
+
+void Canvas::strokePath(const PaintStyle& paint)
+{
+	paint.stroke(*this);
 	nvgStroke(vg);
 }
 
@@ -471,5 +556,9 @@ void Canvas::textAlign(int align)
 {
 	nvgTextAlign(vg, align);
 }
+
+
+
+
 
 OFX_NANOVG_END_NAMESPACE

@@ -10,6 +10,7 @@
 OFX_NANOVG_BEGIN_NAMESPACE
 
 class FrameBuffer;
+class Canvas;
 
 struct TextAlign {
 	enum {
@@ -77,6 +78,122 @@ public:
 	int getAlign() const { return align; }
 };
 
+struct PaintStyle {
+	virtual void fill(Canvas& canvas) const = 0;
+	virtual void stroke(Canvas& canvas) const = 0;
+};
+
+class LinearGradient : public PaintStyle
+{
+public:
+	
+	struct ControlPoint {
+		ofVec2f position;
+		ofFloatColor color;
+	};
+	
+	ControlPoint from, to;
+	
+	LinearGradient() {}
+	
+	LinearGradient(const ofVec2f& from_pos, const ofFloatColor& from_color,
+				   const ofVec2f& to_pos, const ofFloatColor& to_color)
+	{
+		from.position = from_pos;
+		from.color = from_color;
+		to.position = to_pos;
+		to.color = to_color;
+	}
+	
+	void fill(Canvas& canvas) const;
+	void stroke(Canvas& canvas) const;
+};
+
+class BoxGradient : public PaintStyle
+{
+public:
+	
+	ofRectangle rect;
+	float corner_radius, feather;
+	ofFloatColor inner, outer;
+	
+	BoxGradient() {}
+	
+	BoxGradient(const ofRectangle& rect, float corner_radius, float feather,
+				const ofFloatColor& inner, const ofFloatColor& outer)
+		: rect(rect)
+		, corner_radius(corner_radius)
+		, feather(feather)
+		, inner(inner)
+		, outer(outer)
+	{}
+	
+	void fill(Canvas& canvas) const;
+	void stroke(Canvas& canvas) const;
+};
+
+class RadialGradient : public PaintStyle
+{
+public:
+	
+	ofVec2f center;
+	
+	struct ControlPoint {
+		float radius;
+		ofFloatColor color;
+	};
+	
+	ControlPoint inner, outer;
+	
+	RadialGradient() {}
+	
+	RadialGradient(const ofVec2f& center,
+				   float inner_radius, const ofFloatColor& inner_color,
+				   float outer_radius, const ofFloatColor& outer_color)
+	{
+		this->center = center;
+		inner.radius = inner_radius;
+		inner.color = inner_color;
+		outer.radius = outer_radius;
+		outer.color = outer_color;
+	}
+	
+	void fill(Canvas& canvas) const;
+	void stroke(Canvas& canvas) const;
+};
+
+class Image : public PaintStyle
+{
+public:
+	
+	ofRectangle rect;
+	float angle;
+	float alpha;
+	
+	Image() {}
+	~Image();
+	
+	Image(ofTexture* tex, const ofRectangle& rect, float angle = 0, float alpha = 1, int flags = 0)
+		: tex(tex)
+		, rect(rect)
+		, angle(angle)
+		, alpha(alpha)
+		, image(0)
+		, flags(flags)
+	{}
+	
+	void fill(Canvas& canvas) const;
+	void stroke(Canvas& canvas) const;
+	
+protected:
+	
+	mutable int image;
+	int flags;
+	ofTexture* tex;
+	
+	void upload(NVGcontext* ctx) const;
+};
+
 class Canvas
 {
 public:
@@ -108,8 +225,9 @@ public:
 	void beginPath();
 	void closePath();
 	void fillPath();
+	void fillPath(const PaintStyle& paint);
 	void strokePath();
-	
+	void strokePath(const PaintStyle& paint);
 
 	void arc(float cx, float cy, float r, float a0, float a1, int dir);
 	
